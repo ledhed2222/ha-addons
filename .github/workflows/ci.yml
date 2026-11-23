@@ -37,6 +37,7 @@ jobs:
           tags: anki-mcp-addon:ci
       - name: Smoke test
         run: |
+          set -x
           data=$(mktemp -d)
           hash=$(docker run --rm --entrypoint python anki-mcp-addon:ci \
             -c 'from anki_mcp.oauth import hash_password; print(hash_password("ci-password-123"))')
@@ -48,6 +49,7 @@ jobs:
           docker run -d --name addon -p 8000:8000 -v "$data:/data" anki-mcp-addon:ci
           for _ in $(seq 30); do curl -fs http://localhost:8000/health/live && break; sleep 2; done
           curl -fs http://localhost:8000/health/live
+          curl -s -i -X POST http://localhost:8000/mcp
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp)" = 401
           curl -fs http://localhost:8000/.well-known/oauth-authorization-server >/dev/null
           test "$(sudo stat -c %u "$data/state")" = 10001
