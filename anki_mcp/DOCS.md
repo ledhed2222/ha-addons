@@ -7,7 +7,7 @@ Runs [anki-sync-mcp](https://github.com/ledhed2222/anki-sync-mcp) as a headless 
 1. **Create a password hash** on any machine with Docker:
 
    ```sh
-   docker run --rm -it ghcr.io/ledhed2222/anki-sync-mcp:0.2.0-oauth.1 anki-mcp-hash-password
+   docker run --rm -it ghcr.io/ledhed2222/anki-sync-mcp:0.2.0-oauth.2 anki-mcp-hash-password
    ```
 
    Paste the output into **Password hash**. You type the password itself when a client signs in.

@@ -16,7 +16,7 @@ _UID = _GID = 10001
 _LOCAL_HOSTS = "localhost,localhost:*,127.0.0.1,127.0.0.1:*"
 
 
-def _environment(options: dict, collection_exists: bool) -> dict[str, str]:
+def _environment(options: dict) -> dict[str, str]:
     host = urlsplit(options["public_url"]).netloc
     env = {
         "MCP_AUTH_MODE": "builtin",
@@ -31,11 +31,9 @@ def _environment(options: dict, collection_exists: bool) -> dict[str, str]:
     password = options.get("sync_password") or ""
     if username:
         env["ANKI_SYNC_USERNAME"] = username
+        env["ANKI_BOOTSTRAP_MODE"] = "download_if_empty"
     if password:
         env["ANKI_SYNC_PASSWORD"] = password
-    # The server refuses to start when download_if_empty meets a non-empty collection.
-    if username and not collection_exists:
-        env["ANKI_BOOTSTRAP_MODE"] = "download_if_empty"
     return env
 
 
@@ -48,7 +46,7 @@ def _give_data_to_server_user() -> None:
 
 def main() -> None:
     options = json.loads(_OPTIONS.read_text(encoding="utf-8"))
-    env = _environment(options, _COLLECTION.exists())
+    env = _environment(options)
     _give_data_to_server_user()
     os.setgroups([])
     os.setgid(_GID)
