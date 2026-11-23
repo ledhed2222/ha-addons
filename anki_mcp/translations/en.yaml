@@ -1,0 +1,19 @@
+configuration:
+  public_url:
+    name: Public URL
+    description: HTTPS origin your reverse proxy serves this add-on at, such as https://anki.example.com.
+  password_hash:
+    name: Password hash
+    description: Output of anki-mcp-hash-password. You enter the password itself when a client signs in.
+  scopes:
+    name: Scopes
+    description: Comma-separated tool groups to expose (read, write, admin, destructive).
+  sync_username:
+    name: AnkiWeb username
+    description: Used to log in and download your collection when the add-on has none yet.
+  sync_password:
+    name: AnkiWeb password
+    description: Only needed until the first successful start; the sync key is kept afterwards. Clear it then.
+  log_level:
+    name: Log level
+    description: Use debug to see diagnostics such as refused OAuth redirect URIs.

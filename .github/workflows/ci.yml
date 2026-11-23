@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  anki_mcp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: frenck/action-addon-linter@v2.21.2
+        with:
+          path: ./anki_mcp
+      - name: Add-on version matches the image tag
+        run: |
+          version=$(sed -n 's/^version: "\(.*\)"$/\1/p' anki_mcp/config.yaml)
+          tag=$(sed -n 's/^FROM .*:\(.*\)$/\1/p' anki_mcp/Dockerfile)
+          echo "config.yaml version=$version, Dockerfile tag=$tag"
+          test -n "$version" && test "$version" = "$tag"
+      - uses: docker/setup-buildx-action@v4.4.1
+      - uses: docker/build-push-action@v7.4.0
+        with:
+          context: anki_mcp
+          load: true
+          tags: anki-mcp-addon:ci
+      - name: Smoke test
+        run: |
+          set -x
+          data=$(mktemp -d)
+          hash=$(docker run --rm --entrypoint python anki-mcp-addon:ci \
+            -c 'from anki_mcp.oauth import hash_password; print(hash_password("ci-password-123"))')
+          cat > "$data/options.json" <<JSON
+          {"public_url": "http://localhost:8000", "password_hash": "$hash",
+           "scopes": "read,write", "sync_username": "", "sync_password": "", "log_level": "debug"}
+          JSON
+          sudo chown -R root:root "$data"
+          docker run -d --name addon -p 8000:8000 -v "$data:/data" anki-mcp-addon:ci
+          for _ in $(seq 30); do curl -fs http://localhost:8000/health/live && break; sleep 2; done
+          curl -fs http://localhost:8000/health/live
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp)" = 401
+          curl -fs http://localhost:8000/.well-known/oauth-authorization-server >/dev/null
+          test "$(sudo stat -c %u "$data/state")" = 10001
+          test "$(docker exec addon awk '/^Uid:/ {print $2}' /proc/1/status)" = 10001
+      - if: failure()
+        run: docker logs addon || true
