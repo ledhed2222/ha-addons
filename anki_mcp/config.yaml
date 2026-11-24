@@ -1,5 +1,5 @@
 name: Anki MCP
-version: "0.6.0"
+version: "0.7.0"
 slug: anki_mcp
 description: Headless Anki client that syncs with AnkiWeb and serves your collection to MCP clients such as claude.ai.
 url: https://github.com/ledhed2222/ha-addons/tree/master/anki_mcp
