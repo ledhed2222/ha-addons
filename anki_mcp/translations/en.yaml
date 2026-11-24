@@ -2,9 +2,12 @@ configuration:
   public_url:
     name: Public URL
     description: HTTPS origin your reverse proxy serves this add-on at, such as https://anki.example.com.
+  password:
+    name: Password
+    description: The password clients sign in with, at least 12 characters. Restart the add-on right after saving. On start it stores the password as a hash and clears this field. Enter a new one to change it.
   password_hash:
     name: Password hash
-    description: Output of anki-mcp-hash-password. You enter the password itself when a client signs in.
+    description: Filled in by the add-on from Password. Leave it alone.
   scopes:
     name: Scopes
     description: Comma-separated tool groups to expose (read, write, admin, destructive).
