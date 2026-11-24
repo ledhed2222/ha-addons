@@ -27,13 +27,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.4.0
       - name: Add-on version goes up when the add-on changes
         if: github.event_name == 'pull_request'
-        run: |
-          git fetch -q --depth=1 origin "${{ github.base_ref }}"
-          git diff --quiet FETCH_HEAD -- anki_mcp ':!anki_mcp/CHANGELOG.md' && exit 0
-          old=$(git show FETCH_HEAD:anki_mcp/config.yaml | sed -n 's/^version: "\(.*\)"$/\1/p')
-          new=$(sed -n 's/^version: "\(.*\)"$/\1/p' anki_mcp/config.yaml)
-          echo "base version=$old, PR version=$new"
-          uv run --no-project --with awesomeversion python -I -c 'import sys; from awesomeversion import AwesomeVersion as V; sys.exit(0 if V(sys.argv[2]) > V(sys.argv[1]) else 1)' "$old" "$new"
+        run: .github/scripts/version-check.sh
       - uses: docker/setup-buildx-action@v4.4.1
       - uses: docker/build-push-action@v7.4.0
         with:
@@ -41,29 +35,4 @@ jobs:
           load: true
           tags: anki-mcp-addon:ci
       - name: Smoke test
-        run: |
-          set -x
-          data=$(mktemp -d)
-          cat > "$data/options.json" <<JSON
-          {"public_url": "http://localhost:8000", "password": "ci-password-123", "password_hash": "",
-           "scopes": "read,write", "sync_username": "", "sync_password": "", "log_level": "debug"}
-          JSON
-          sudo chown -R root:root "$data"
-          docker run -d --name addon -p 8000:8000 -v "$data:/data" \
-            --health-interval=2s --health-start-period=0s anki-mcp-addon:ci
-          for _ in $(seq 30); do curl -fs http://localhost:8000/health/live && break; sleep 2; done
-          curl -fs http://localhost:8000/health/live
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp)" = 401
-          curl -fs http://localhost:8000/.well-known/oauth-authorization-server >/dev/null
-          test "$(sudo stat -c %u "$data/state")" = 10001
-          ! sudo grep -q ci-password-123 "$data/options.json"
-          sudo grep -q '"password_hash": "scrypt\$' "$data/options.json"
-          test "$(docker exec addon awk '/^Uid:/ {print $2}' /proc/1/status)" = 10001
-          for _ in $(seq 15); do
-            status=$(docker inspect -f '{{.State.Health.Status}}' addon)
-            [ "$status" = healthy ] && break
-            sleep 2
-          done
-          test "$status" = healthy
-      - if: failure()
-        run: docker logs addon || true
+        run: .github/scripts/smoke-test.sh

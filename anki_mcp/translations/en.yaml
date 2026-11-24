@@ -26,3 +26,9 @@ configuration:
   log_level:
     name: Log level
     description: Use debug to see diagnostics such as refused OAuth redirect URIs.
+  https_proxy:
+    name: HTTPS proxy
+    description: Proxy URL, such as http://user:pass@proxy.lan:3128, for media downloads and AnkiWeb sync. Leave empty to connect directly.
+  no_proxy:
+    name: No proxy
+    description: Comma-separated hosts that skip the HTTPS proxy, such as ankiweb.net.

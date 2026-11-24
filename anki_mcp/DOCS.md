@@ -13,6 +13,21 @@ Runs [anki-sync-mcp](https://github.com/ledhed2222/anki-sync-mcp) as a headless 
 
 Test with a throwaway AnkiWeb account before pointing it at your real one.
 
+## Media downloads
+
+Clients can ask the server to download a media file from a URL instead of sending its bytes. It only downloads from an allow-list of hosts, which by default is `cdn.jsdelivr.net`, `fonts.gstatic.com`, `raw.githubusercontent.com`, `unpkg.com` and `upload.wikimedia.org`.
+
+To replace that list, create `media_url_hosts.txt` in this add-on's config folder (`/addon_configs/<id>_anki_mcp/` on the host, where `<id>` is a short code for this add-on repository; the Samba and File editor add-ons can reach it) and restart the add-on. Put one bare hostname per line; blank lines and `#` comments are ignored. An entry such as `https://example.com` stops the add-on from starting. An empty file refuses every URL. Delete the file to go back to the default list.
+
+```text
+# Fontsource and other npm packages
+cdn.jsdelivr.net
+# Wikipedia and Wikimedia Commons images
+upload.wikimedia.org
+```
+
+Each host sees this machine's public IP address. To hide it, set **HTTPS proxy** to a proxy URL such as `http://user:password@proxy.lan:3128`. The add-on never logs it. Anki's sync client uses the same proxy, so AnkiWeb sync goes through it too unless you add `ankiweb.net` to **No proxy**, a comma-separated list of hosts that connect directly. The proxy sees the host of every download and sync.
+
 ## Data
 
 The collection, sync key and OAuth state live in this add-on's `/data` folder. Home Assistant backups include it. OAuth tokens are stored only as hashes.
