@@ -26,6 +26,8 @@ new_version="$major.$((minor + 1)).0"
 
 sed -i "s|anki-sync-mcp:$old_image|anki-sync-mcp:$new_image|" anki_mcp/Dockerfile anki_mcp/DOCS.md
 sed -i "s/^version: \"$old_version\"$/version: \"$new_version\"/" anki_mcp/config.yaml
+.github/scripts/changelog-entry.sh anki_mcp "$new_version" "Bump anki-sync-mcp to $new_image"
+git add anki_mcp/CHANGELOG.md
 git diff --stat
 
 git config user.name "github-actions[bot]"

@@ -29,7 +29,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           git fetch -q --depth=1 origin "${{ github.base_ref }}"
-          git diff --quiet FETCH_HEAD -- anki_mcp && exit 0
+          git diff --quiet FETCH_HEAD -- anki_mcp ':!anki_mcp/CHANGELOG.md' && exit 0
           old=$(git show FETCH_HEAD:anki_mcp/config.yaml | sed -n 's/^version: "\(.*\)"$/\1/p')
           new=$(sed -n 's/^version: "\(.*\)"$/\1/p' anki_mcp/config.yaml)
           echo "base version=$old, PR version=$new"
