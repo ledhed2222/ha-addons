@@ -7,7 +7,3 @@ updates:
     groups:
       actions:
         patterns: ["*"]
-  - package-ecosystem: docker
-    directory: /anki_mcp
-    schedule:
-      interval: weekly
