@@ -11,6 +11,12 @@ configuration:
   scopes:
     name: Scopes
     description: Comma-separated tool groups to expose (read, write, admin, destructive).
+  allow_schema_changes:
+    name: Allow note type changes
+    description: Lets clients create note types and change their CSS, template text and names. Needs admin in Scopes.
+  allow_full_sync:
+    name: Allow full syncs
+    description: Also lets clients add, remove or reorder note type fields and templates, which forces a full sync with AnkiWeb. Needs Allow note type changes.
   sync_username:
     name: AnkiWeb username
     description: Used to log in and download your collection when the add-on has none yet.

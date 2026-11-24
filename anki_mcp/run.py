@@ -27,6 +27,8 @@ def _environment(options: dict) -> dict[str, str]:
         "MCP_PUBLIC_URL": options["public_url"],
         "MCP_OAUTH_PASSWORD_HASH": options["password_hash"],
         "MCP_SCOPES": options["scopes"],
+        "ANKI_ALLOW_SCHEMA_CHANGES": str(bool(options.get("allow_schema_changes"))).lower(),
+        "ANKI_ALLOW_FULL_SYNC": str(bool(options.get("allow_full_sync"))).lower(),
         "MCP_ALLOWED_HOSTS": f"{_LOCAL_HOSTS},{host}",
         "ANKI_COLLECTION_PATH": str(_COLLECTION),
         "LOG_LEVEL": options["log_level"],
