@@ -44,10 +44,8 @@ jobs:
         run: |
           set -x
           data=$(mktemp -d)
-          hash=$(docker run --rm --entrypoint python anki-mcp-addon:ci \
-            -c 'from anki_mcp.oauth import hash_password; print(hash_password("ci-password-123"))')
           cat > "$data/options.json" <<JSON
-          {"public_url": "http://localhost:8000", "password_hash": "$hash",
+          {"public_url": "http://localhost:8000", "password": "ci-password-123", "password_hash": "",
            "scopes": "read,write", "sync_username": "", "sync_password": "", "log_level": "debug"}
           JSON
           sudo chown -R root:root "$data"
@@ -58,6 +56,8 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp)" = 401
           curl -fs http://localhost:8000/.well-known/oauth-authorization-server >/dev/null
           test "$(sudo stat -c %u "$data/state")" = 10001
+          ! sudo grep -q ci-password-123 "$data/options.json"
+          sudo grep -q '"password_hash": "scrypt\$' "$data/options.json"
           test "$(docker exec addon awk '/^Uid:/ {print $2}' /proc/1/status)" = 10001
           for _ in $(seq 15); do
             status=$(docker inspect -f '{{.State.Health.Status}}' addon)

@@ -4,13 +4,7 @@ Runs [anki-sync-mcp](https://github.com/ledhed2222/anki-sync-mcp) as a headless 
 
 ## Setup
 
-1. **Create a password hash** on any machine with Docker:
-
-   ```sh
-   docker run --rm -it ghcr.io/ledhed2222/anki-sync-mcp:0.2.0-oauth.7 anki-mcp-hash-password
-   ```
-
-   Paste the output into **Password hash**. You type the password itself when a client signs in.
+1. **Password**: choose the password clients sign in with, at least 12 characters. On start the add-on saves it as a hash in **Password hash** and clears **Password**, so no plain-text copy stays in the configuration or in backups. Until then the password is stored in plain text, so restart the add-on right after saving. To change it, enter a new password, save, and restart.
 2. **Public URL**: the HTTPS address your reverse proxy serves this add-on at, for example `https://anki.example.com`. Proxy it to port 8000 on this host. The proxy must pass the original `Host` header through and forward `/mcp`, `/oauth/login`, `/authorize`, `/token`, `/register`, `/revoke` and `/.well-known/`.
 3. **AnkiWeb username and password**: on the first start, the add-on logs in and downloads your collection. After that it keeps a sync key, so clear the password field.
 4. **Scopes**: leave this at `read,write` unless you need more. `admin` and `destructive` expose tools that can rewrite or delete data.

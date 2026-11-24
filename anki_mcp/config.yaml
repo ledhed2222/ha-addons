@@ -1,5 +1,5 @@
 name: Anki MCP
-version: "0.7.0"
+version: "0.7.1"
 slug: anki_mcp
 description: Headless Anki client that syncs with AnkiWeb and serves your collection to MCP clients such as claude.ai.
 url: https://github.com/ledhed2222/ha-addons/tree/master/anki_mcp
@@ -7,12 +7,14 @@ arch:
   - aarch64
   - amd64
 init: false
+hassio_api: true
 ports:
   8000/tcp: 8000
 ports_description:
   8000/tcp: MCP server (plain HTTP; serve it through an HTTPS reverse proxy)
 options:
   public_url: ""
+  password: ""
   password_hash: ""
   scopes: read,write
   sync_username: ""
@@ -20,7 +22,8 @@ options:
   log_level: info
 schema:
   public_url: url
-  password_hash: password
+  password: password?
+  password_hash: password?
   scopes: match(^(read|write|admin|destructive)(,(read|write|admin|destructive))*$)
   sync_username: str?
   sync_password: password?
