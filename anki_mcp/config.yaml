@@ -9,7 +9,6 @@ arch:
 init: false
 hassio_api: true
 ingress: true
-ingress_port: 8099
 panel_icon: mdi:card-account-details
 panel_title: Anki MCP
 map:

@@ -27,7 +27,7 @@ _CONFIG = Path(os.environ.get("ADDON_CONFIG", "/config"))
 _MEDIA_URL_HOSTS = _CONFIG / "media_url_hosts.txt"
 _UID = _GID = 10001
 _LOCAL_HOSTS = "localhost,localhost:*,127.0.0.1,127.0.0.1:*"
-_INGRESS_PORT = 8099
+_INGRESS_PORT = 8099  # Home Assistant's default ingress port, so config.yaml leaves it out
 # Options from 0.9 and earlier, read once to carry the owner's account over, then cleared.
 _LEGACY_OPTIONS = ("password", "password_hash", "sync_username", "sync_password")
 
