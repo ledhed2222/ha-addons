@@ -1,13 +1,16 @@
 name: Anki MCP
-version: "0.9.0"
+version: "0.10.0"
 slug: anki_mcp
-description: Headless Anki client that syncs with AnkiWeb and serves your collection to MCP clients such as claude.ai.
+description: Headless Anki server that gives each invited user their own AnkiWeb-synced collection for MCP clients such as claude.ai.
 url: https://github.com/ledhed2222/ha-addons/tree/master/anki_mcp
 arch:
   - aarch64
   - amd64
 init: false
 hassio_api: true
+ingress: true
+panel_icon: mdi:card-account-details
+panel_title: Anki MCP
 map:
   - addon_config:rw
 ports:
@@ -16,23 +19,30 @@ ports_description:
   8000/tcp: MCP server (plain HTTP; serve it through an HTTPS reverse proxy)
 options:
   public_url: ""
-  password: ""
-  password_hash: ""
   scopes: read,write,admin
   allow_schema_changes: true
   allow_full_sync: true
-  sync_username: ""
-  sync_password: ""
+  max_open_collections: 20
+  smtp_port: 587
+  smtp_security: starttls
   log_level: info
 schema:
   public_url: url
-  password: password?
-  password_hash: password?
   scopes: match(^(read|write|admin|destructive)(,(read|write|admin|destructive))*$)
   allow_schema_changes: bool
   allow_full_sync: bool
-  sync_username: str?
-  sync_password: password?
+  max_open_collections: int(1,10000)
+  smtp_host: str?
+  smtp_port: port
+  smtp_security: list(starttls|tls|none)
+  smtp_username: str?
+  smtp_password: password?
+  smtp_from: str?
   log_level: list(debug|info|warning|error)
   https_proxy: url?
   no_proxy: str?
+  # Read once when upgrading from 0.9 to carry the owner's account over, then cleared.
+  password: password?
+  password_hash: password?
+  sync_username: str?
+  sync_password: password?

@@ -2,12 +2,6 @@ configuration:
   public_url:
     name: Public URL
     description: HTTPS origin your reverse proxy serves this add-on at, such as https://anki.example.com.
-  password:
-    name: Password
-    description: The password clients sign in with, at least 12 characters. Restart the add-on right after saving. On start it stores the password as a hash and clears this field. Enter a new one to change it.
-  password_hash:
-    name: Password hash
-    description: Filled in by the add-on from Password. Leave it alone.
   scopes:
     name: Scopes
     description: Comma-separated tool groups to expose (read, write, admin, destructive).
@@ -17,12 +11,26 @@ configuration:
   allow_full_sync:
     name: Allow full syncs
     description: Also lets clients add, remove or reorder note type fields and templates, which forces a full sync with AnkiWeb. Needs Allow note type changes.
-  sync_username:
-    name: AnkiWeb username
-    description: Used to log in and download your collection when the add-on has none yet.
-  sync_password:
-    name: AnkiWeb password
-    description: Only needed until the first successful start; the sync key is kept afterwards. Clear it then.
+  max_open_collections:
+    name: Open collections
+    description: Most users' collections kept open at once. Each takes a few MB of memory; idle ones close after 15 minutes.
+  smtp_host:
+    name: Mail server
+    description: SMTP host for emailing setup and password reset links. Leave empty to copy links from the users panel instead.
+  smtp_port:
+    name: Mail server port
+    description: Usually 587 with STARTTLS, or 465 with TLS.
+  smtp_security:
+    name: Mail server security
+    description: starttls, tls, or none (only allowed for a mail server on this machine).
+  smtp_username:
+    name: Mail server username
+    description: Leave empty if the mail server needs no login.
+  smtp_password:
+    name: Mail server password
+  smtp_from:
+    name: Sender address
+    description: Who the emails come from, such as Anki MCP <anki@example.com>. Required with a mail server.
   log_level:
     name: Log level
     description: Use debug to see diagnostics such as refused OAuth redirect URIs.
@@ -32,3 +40,15 @@ configuration:
   no_proxy:
     name: No proxy
     description: Comma-separated hosts that skip the HTTPS proxy, such as ankiweb.net.
+  password:
+    name: Password (0.9 upgrade only)
+    description: Read once when upgrading from 0.9, then cleared. Manage passwords from the users panel.
+  password_hash:
+    name: Password hash (0.9 upgrade only)
+    description: Read once when upgrading from 0.9, then cleared.
+  sync_username:
+    name: AnkiWeb username (0.9 upgrade only)
+    description: Read once when upgrading from 0.9, then cleared.
+  sync_password:
+    name: AnkiWeb password (0.9 upgrade only)
+    description: Read once when upgrading from 0.9, then cleared.
