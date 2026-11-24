@@ -1,7 +1,7 @@
 """Home Assistant add-on entrypoint: map add-on options onto anki-sync-mcp settings and start it.
 
-Runs as root only long enough to give the server's user ownership of /data, then drops to that
-user and execs the server.
+Runs as root only long enough to give the server's user ownership of /data and /config, then
+drops to that user and execs the server.
 """
 
 import json
@@ -16,6 +16,8 @@ from anki_mcp.oauth import hash_password
 _DATA = Path(os.environ.get("ADDON_DATA", "/data"))
 _OPTIONS = _DATA / "options.json"
 _COLLECTION = _DATA / "collection.anki2"
+_CONFIG = Path(os.environ.get("ADDON_CONFIG", "/config"))
+_MEDIA_URL_HOSTS = _CONFIG / "media_url_hosts.txt"
 _UID = _GID = 10001
 _LOCAL_HOSTS = "localhost,localhost:*,127.0.0.1,127.0.0.1:*"
 
@@ -40,6 +42,12 @@ def _environment(options: dict) -> dict[str, str]:
         env["ANKI_BOOTSTRAP_MODE"] = "download_if_empty"
     if password:
         env["ANKI_SYNC_PASSWORD"] = password
+    if _MEDIA_URL_HOSTS.is_file():
+        env["ANKI_MEDIA_URL_HOSTS_FILE"] = str(_MEDIA_URL_HOSTS)
+    if options.get("https_proxy"):
+        env["HTTPS_PROXY"] = options["https_proxy"]
+    if options.get("no_proxy"):
+        env["NO_PROXY"] = options["no_proxy"]
     return env
 
 
@@ -68,8 +76,8 @@ def _replace_password_with_hash(options: dict) -> dict:
     return options
 
 
-def _give_data_to_server_user() -> None:
-    for root, _, files in os.walk(_DATA):
+def _give_to_server_user(top: Path) -> None:
+    for root, _, files in os.walk(top):
         for path in [root, *(os.path.join(root, name) for name in files)]:
             if path != str(_OPTIONS) and os.lstat(path).st_uid != _UID:
                 os.lchown(path, _UID, _GID)
@@ -78,7 +86,8 @@ def _give_data_to_server_user() -> None:
 def main() -> None:
     options = _replace_password_with_hash(json.loads(_OPTIONS.read_text(encoding="utf-8")))
     env = _environment(options)
-    _give_data_to_server_user()
+    _give_to_server_user(_DATA)
+    _give_to_server_user(_CONFIG)
     os.setgroups([])
     os.setgid(_GID)
     os.setuid(_UID)
