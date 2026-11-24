@@ -21,7 +21,8 @@ test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8000/mcp
 curl -fs http://localhost:8000/.well-known/oauth-authorization-server >/dev/null
 test "$(sudo stat -c %u "$data/state")" = 10001
 test "$(sudo stat -c %u "$config/media_url_hosts.txt")" = 10001
-environ=$(docker exec addon sh -c "tr '\0' '\n' </proc/1/environ")
+# After the privilege drop the server is non-dumpable, so only the host's root can read its environment.
+environ=$(sudo cat "/proc/$(docker inspect -f '{{.State.Pid}}' addon)/environ" | tr '\0' '\n')
 grep -qx ANKI_MEDIA_URL_HOSTS_FILE=/config/media_url_hosts.txt <<<"$environ"
 grep -qx HTTPS_PROXY=http://proxy.invalid:3128 <<<"$environ"
 grep -qx NO_PROXY=ankiweb.net <<<"$environ"
